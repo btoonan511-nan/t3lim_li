@@ -5,6 +5,9 @@
  */
 
 const CONFIG = {
+  // جدول Google Sheets ومجلد الصور في Drive
+  SPREADSHEET_ID: '1vN17vKyfg6eXyLrD3yW6A0ugBa0ZE_1cE-LxVmSYzHs',
+  PHOTOS_FOLDER_ID: '1S5SWqLTWbq9rmrozSUJr6dt9XToQ9EB4',
   SHEET_NAME: 'الأعمال',
   FOLDER_NAME: 'صور أعمال الصيانة - سماء الميدان',
   // رمز دخول اختياري يعطى للمشرفين. اتركه فارغاً '' لتعطيله.
@@ -147,7 +150,9 @@ function validate_(p) {
 }
 
 function getSheet_() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = CONFIG.SPREADSHEET_ID
+    ? SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID)
+    : SpreadsheetApp.getActiveSpreadsheet();
   let sheet = ss.getSheetByName(CONFIG.SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(CONFIG.SHEET_NAME);
@@ -155,7 +160,7 @@ function getSheet_() {
     sheet.getRange(1, 1, 1, HEADERS.length)
       .setValues([HEADERS])
       .setFontWeight('bold')
-      .setBackground('#0b5394')
+      .setBackground('#7f1d2d')
       .setFontColor('#ffffff');
     sheet.setFrozenRows(1);
     sheet.setColumnWidth(7, 320);
@@ -164,6 +169,7 @@ function getSheet_() {
 }
 
 function getRootFolder_() {
+  if (CONFIG.PHOTOS_FOLDER_ID) return DriveApp.getFolderById(CONFIG.PHOTOS_FOLDER_ID);
   const props = PropertiesService.getScriptProperties();
   const id = props.getProperty('ROOT_FOLDER_ID');
   if (id) {

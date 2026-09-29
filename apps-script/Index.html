@@ -8,15 +8,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f3f5f8;
-      --card: #ffffff;
-      --text: #1c2430;
-      --muted: #667085;
-      --border: #d5dbe3;
-      --primary: #0b5394;
-      --primary-soft: #e6eef7;
-      --danger: #c62828;
-      --success: #1e7d32;
+      --bg: #ffffff;
+      --text: #3a1016;
+      --muted: #8a6a5e;
+      --line: #c2410c;          /* برتقالي غامق */
+      --line-soft: #f3c6a8;
+      --wine: #7f1d2d;          /* عنابي */
+      --red: #b3261e;           /* أحمر */
+      --grad: linear-gradient(135deg, var(--red), var(--wine));
+      --danger: #b3261e;
+      --success: #2e7d32;
     }
     * { box-sizing: border-box; }
     body {
@@ -27,33 +28,41 @@
       font-size: 16px;
     }
     header {
-      background: var(--primary);
-      color: #fff;
-      padding: 16px;
+      background: #fff;
+      padding: 18px 16px 14px;
       text-align: center;
+      border-bottom: 3px solid var(--line);
     }
-    header h1 { margin: 0; font-size: 20px; font-weight: 700; }
-    header p { margin: 4px 0 0; font-size: 13px; opacity: .85; }
+    header h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    header p { margin: 4px 0 0; font-size: 13px; color: var(--line); font-weight: 500; }
     main { max-width: 560px; margin: 0 auto; padding: 16px; }
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
+      background: #fff;
+      border: 1.5px solid var(--line);
       border-radius: 12px;
       padding: 16px;
       margin-bottom: 14px;
     }
-    .title { display: block; font-weight: 700; margin-bottom: 8px; }
-    .title .req { color: var(--danger); }
+    .title { display: block; font-weight: 700; margin-bottom: 8px; color: var(--wine); }
+    .title .req { color: var(--line); }
     input[type=text], input[type=password], textarea {
       width: 100%;
       padding: 12px;
       font: inherit;
-      border: 1px solid var(--border);
+      border: 1px solid var(--line-soft);
       border-radius: 8px;
       background: #fff;
       color: var(--text);
     }
-    input:focus, textarea:focus { outline: 2px solid var(--primary); border-color: transparent; }
+    input:focus, textarea:focus { outline: 2px solid var(--line); border-color: transparent; }
     textarea { min-height: 110px; resize: vertical; }
     .field + .field { margin-top: 16px; }
     .seg { display: flex; gap: 8px; }
@@ -62,30 +71,32 @@
       flex: 1;
       text-align: center;
       padding: 11px 6px;
-      border: 1px solid var(--border);
+      border: 1.5px solid var(--line);
       border-radius: 8px;
       cursor: pointer;
       font-weight: 500;
+      color: var(--wine);
+      background: #fff;
       user-select: none;
     }
     .seg input:checked + label {
-      background: var(--primary);
-      border-color: var(--primary);
+      background: var(--grad);
+      border-color: var(--wine);
       color: #fff;
     }
     .photos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .slot {
       position: relative;
       aspect-ratio: 4 / 3;
-      border: 2px dashed var(--border);
+      border: 2px dashed var(--line);
       border-radius: 10px;
-      background: var(--primary-soft);
+      background: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       cursor: pointer;
-      color: var(--primary);
+      color: var(--line);
       font-weight: 500;
     }
     .slot img { width: 100%; height: 100%; object-fit: cover; }
@@ -98,7 +109,7 @@
       height: 30px;
       border-radius: 50%;
       border: 0;
-      background: rgba(0,0,0,.65);
+      background: var(--wine);
       color: #fff;
       font-size: 18px;
       line-height: 30px;
@@ -113,15 +124,16 @@
       font-size: 18px;
       border: 0;
       border-radius: 10px;
-      background: var(--primary);
+      background: var(--grad);
       color: #fff;
       cursor: pointer;
+      box-shadow: 0 3px 0 var(--line);
     }
     button.submit:disabled { opacity: .6; cursor: wait; }
-    .msg { border-radius: 10px; padding: 14px; margin-bottom: 14px; display: none; }
-    .msg.error { display: block; background: #fdecea; color: var(--danger); }
-    .msg.ok { display: block; background: #e8f5e9; color: var(--success); }
-    .msg strong { font-size: 18px; }
+    .msg { border-radius: 10px; padding: 14px; margin-bottom: 14px; display: none; border: 1.5px solid; }
+    .msg.error { display: block; background: #fff; color: var(--danger); border-color: var(--danger); }
+    .msg.ok { display: block; background: #fff; color: var(--success); border-color: var(--success); }
+    .msg strong { font-size: 18px; color: var(--wine); }
     .hidden { display: none; }
   </style>
 </head>
