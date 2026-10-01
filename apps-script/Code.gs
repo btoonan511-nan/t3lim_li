@@ -43,6 +43,27 @@ function doGet() {
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
+/**
+ * واجهة الموقع الخارجي (GitHub Pages): يستقبل {action, payload} ويرجع {ok, data} أو {ok:false, error}.
+ */
+function doPost(e) {
+  let result;
+  try {
+    const req = JSON.parse(e.postData.contents);
+    if (req.action === 'submitWork') {
+      result = { ok: true, data: submitWork(req.payload) };
+    } else if (req.action === 'getAppConfig') {
+      result = { ok: true, data: getAppConfig() };
+    } else {
+      throw new Error('طلب غير معروف');
+    }
+  } catch (err) {
+    result = { ok: false, error: err.message || String(err) };
+  }
+  return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 /** إعدادات تحتاجها الواجهة عند الفتح. */
 function getAppConfig() {
   return {

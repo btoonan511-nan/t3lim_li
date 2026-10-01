@@ -31,9 +31,22 @@
 
 > المشرفون ما يحتاجون حساب Google ولا صلاحية على الجدول. التطبيق يحفظ باسم صاحب الجدول.
 
+## الموقع
+
+الواجهة منشورة على GitHub Pages من مجلد `docs/`:
+**https://btoonan511-nan.github.io/t3lim_li/**
+
+الموقع يرسل البيانات لـ Apps Script (الرابط في `API_URL` داخل `build.py`)، والسكربت يحفظ في الجدول والصور في Drive.
+
+تفعيل الموقع (مرة واحدة): **Settings ← Pages ← Build and deployment**
+- Source: **Deploy from a branch**
+- Branch: `claude/comprehensive-research-first-q3sgjv` ومجلد **`/docs`** ← **Save**
+
+بعد أي تعديل على الكود في Apps Script: **Deploy ← Manage deployments ← ✏️ ← Version: New version ← Deploy** (الرابط يبقى نفسه).
+
 ## للمطورين
 
-`Code.gs` و `Index.html` هي المصدر. بعد أي تعديل عليهم شغّل `python3 build.py` لتوليد `app.gs`.
+`Code.gs` و `Index.html` هي المصدر. بعد أي تعديل عليهم شغّل `python3 build.py` لتوليد `app.gs` و `docs/index.html`.
 
 ## رمز دخول (اختياري)
 

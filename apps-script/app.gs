@@ -43,6 +43,27 @@ function doGet() {
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
+/**
+ * واجهة الموقع الخارجي (GitHub Pages): يستقبل {action, payload} ويرجع {ok, data} أو {ok:false, error}.
+ */
+function doPost(e) {
+  let result;
+  try {
+    const req = JSON.parse(e.postData.contents);
+    if (req.action === 'submitWork') {
+      result = { ok: true, data: submitWork(req.payload) };
+    } else if (req.action === 'getAppConfig') {
+      result = { ok: true, data: getAppConfig() };
+    } else {
+      throw new Error('طلب غير معروف');
+    }
+  } catch (err) {
+    result = { ok: false, error: err.message || String(err) };
+  }
+  return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 /** إعدادات تحتاجها الواجهة عند الفتح. */
 function getAppConfig() {
   return {
@@ -393,6 +414,8 @@ const INDEX_HTML = `<!DOCTYPE html>
   </main>
 
   <script>
+    // رابط Apps Script (ينتهي بـ /exec) عند تشغيل الواجهة من موقع خارجي. يبقى فارغاً داخل Apps Script.
+    var API_URL = '';
     var MAX_SIDE = 1600;
     var JPEG_QUALITY = 0.75;
     var STORE = {
@@ -411,6 +434,26 @@ const INDEX_HTML = `<!DOCTYPE html>
     var busy = false;
 
     function $(id) { return document.getElementById(id); }
+
+    // يستدعي دالة في الخادم: مباشرة داخل Apps Script، أو عبر الرابط من الموقع الخارجي
+    function callServer(action, payload) {
+      if (window.google && google.script && google.script.run) {
+        return new Promise(function (resolve, reject) {
+          google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[action](payload);
+        });
+      }
+      return fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: action, payload: payload }),
+      }).then(function (r) {
+        if (!r.ok) throw new Error('تعذر الاتصال بالخادم');
+        return r.json();
+      }).then(function (res) {
+        if (!res.ok) throw new Error(res.error);
+        return res.data;
+      });
+    }
 
     function storeGet(key) {
       try { return localStorage.getItem(key) || ''; } catch (e) { return ''; }
@@ -602,20 +645,20 @@ const INDEX_HTML = `<!DOCTYPE html>
       if (config.needsCode) storeSet(STORE.code, d.code);
       setBusy(true, 'جاري الحفظ...');
 
-      google.script.run
-        .withSuccessHandler(function (res) {
+      callServer('submitWork', d)
+        .then(function (res) {
           setBusy(false);
           rememberEngineer(d.engineer);
           resetForm();
           showMsg('ok', 'تم حفظ العمل ✔<br><strong>' + escapeHtml(res.recordId) + '</strong><br>' +
             escapeHtml(d.refType + ' ' + d.refNumber) + ' — ' + escapeHtml(res.date));
         })
-        .withFailureHandler(function (error) {
+        .catch(function (error) {
           setBusy(false);
           var text = (error && error.message) || 'تعذر الحفظ، تأكد من الاتصال وحاول مرة ثانية';
+          if (/fetch|network/i.test(text)) text = 'تعذر الحفظ، تأكد من الاتصال وحاول مرة ثانية';
           showMsg('error', escapeHtml(text));
-        })
-        .submitWork(d);
+        });
     });
 
     function init() {
@@ -630,12 +673,10 @@ const INDEX_HTML = `<!DOCTYPE html>
     }
 
     init();
-    google.script.run
-      .withSuccessHandler(function (c) {
-        config.needsCode = c.needsCode;
-        $('codeField').classList.toggle('hidden', !config.needsCode);
-      })
-      .getAppConfig();
+    callServer('getAppConfig').then(function (c) {
+      config.needsCode = c.needsCode;
+      $('codeField').classList.toggle('hidden', !config.needsCode);
+    }).catch(function () {});
   </script>
 </body>
 </html>
